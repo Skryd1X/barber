@@ -1,52 +1,41 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
-interface LoaderProps {
-  tagline: string;
-  onComplete: () => void;
-}
+interface LoaderProps { tagline: string; onComplete: () => void; }
 
 export function Loader({ tagline, onComplete }: LoaderProps) {
-  const [step, setStep] = useState(0);
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setStep(1), 280),
-      setTimeout(() => setStep(2), 760),
-      setTimeout(() => setHide(true), 1600),
-      setTimeout(() => onComplete(), 2100),
-    ];
-    return () => timers.forEach(clearTimeout);
+    const exit = window.setTimeout(() => setHide(true), 1900);
+    const done = window.setTimeout(onComplete, 2300);
+    return () => { window.clearTimeout(exit); window.clearTimeout(done); };
   }, [onComplete]);
 
   return (
     <AnimatePresence>
       {!hide && (
         <motion.div
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-ink-950"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.45 }}
+          className="fixed inset-0 z-[10000] grid place-items-center overflow-hidden bg-ink-950"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 1.018, filter: 'blur(8px)' }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.12),transparent_55%)]" />
-          <Scissors step={step} />
-          <motion.p
-            className="mt-8 text-xs uppercase tracking-[0.45em] text-cream-200/45"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 }}
-          >
-            {tagline}
-          </motion.p>
-          <div className="mt-4 flex gap-2">
-            {[1, 2].map((n) => (
-              <div
-                key={n}
-                className={`h-[2px] w-8 rounded-full transition-all duration-300 ${
-                  step >= n ? 'bg-gold-400' : 'bg-gold-400/20'
-                }`}
-              />
-            ))}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,.13),transparent_46%)]" />
+          <div className="relative flex flex-col items-center">
+            <RealScissors />
+            <motion.div
+              className="mt-7 h-px w-40 origin-center bg-gradient-to-r from-transparent via-gold-300 to-transparent"
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: [0, 1, 0.55, 1], opacity: [0, 1, 0.5, 1] }}
+              transition={{ duration: 1.45, times: [0, .34, .62, 1], ease: 'easeInOut' }}
+            />
+            <motion.p
+              className="mt-5 text-[10px] font-medium uppercase tracking-[0.46em] text-cream-200/[0.45]"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: .25, duration: .45 }}
+            >{tagline}</motion.p>
           </div>
         </motion.div>
       )}
@@ -54,53 +43,40 @@ export function Loader({ tagline, onComplete }: LoaderProps) {
   );
 }
 
-function Scissors({ step }: { step: number }) {
-  const rotate = step === 1 ? 0 : step === 2 ? -8 : 14;
-  const rotate2 = step === 1 ? 0 : step === 2 ? 8 : -14;
-
+function RealScissors() {
+  const transition = { duration: 1.48, times: [0, .18, .34, .56, .72, 1], ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
   return (
-    <motion.svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+    <motion.svg width="154" height="154" viewBox="0 0 154 154" fill="none" aria-hidden="true" initial={{ opacity: 0, scale: .9, rotate: -6 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: .45 }}>
       <defs>
-        <linearGradient id="goldLoader" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f5ead0" />
-          <stop offset="55%" stopColor="#d4af37" />
-          <stop offset="100%" stopColor="#8a661d" />
-        </linearGradient>
-        <linearGradient id="steelLoader" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f1f1f2" />
-          <stop offset="60%" stopColor="#9fa3aa" />
-          <stop offset="100%" stopColor="#d6d9df" />
-        </linearGradient>
+        <linearGradient id="steel" x1="25" y1="18" x2="123" y2="136" gradientUnits="userSpaceOnUse"><stop stopColor="#FFFFFF"/><stop offset=".25" stopColor="#AEB3BA"/><stop offset=".48" stopColor="#F2F2F0"/><stop offset=".72" stopColor="#777C84"/><stop offset="1" stopColor="#D9D9D5"/></linearGradient>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#FFF3C7"/><stop offset=".45" stopColor="#D4AF37"/><stop offset="1" stopColor="#7B5717"/></linearGradient>
+        <filter id="soft"><feGaussianBlur stdDeviation="4"/></filter>
       </defs>
+      <ellipse cx="77" cy="80" rx="54" ry="52" fill="#d4af37" opacity=".06" filter="url(#soft)"/>
 
-      <motion.g style={{ originX: '50%', originY: '50%' }} animate={{ rotate }} transition={{ duration: 0.24 }}>
-        <circle cx="32" cy="34" r="14" stroke="url(#goldLoader)" strokeWidth="4" />
-        <path d="M43 44 L60 60 L32 90 L24 82 Z" fill="url(#steelLoader)" stroke="#6f7680" strokeWidth="1.2" />
+      <motion.g style={{ transformOrigin: '77px 78px' }} animate={{ rotate: [-22, -22, 7, -22, 7, -22] }} transition={transition}>
+        <path d="M73 77 31 121c-5 5-13 5-18 0s-5-13 0-18L61 67Z" fill="url(#steel)" stroke="#45484F" strokeWidth="1.4"/>
+        <path d="M72 75 46 50" stroke="#8D929A" strokeWidth="7" strokeLinecap="round"/>
+        <circle cx="35" cy="39" r="16" stroke="url(#gold)" strokeWidth="5" fill="#0C0C0F"/>
+        <circle cx="35" cy="39" r="9.5" stroke="#6E5520" strokeWidth="1" opacity=".7"/>
       </motion.g>
 
-      <motion.g style={{ originX: '50%', originY: '50%' }} animate={{ rotate: rotate2 }} transition={{ duration: 0.24 }}>
-        <circle cx="88" cy="34" r="14" stroke="url(#goldLoader)" strokeWidth="4" />
-        <path d="M77 44 L60 60 L88 90 L96 82 Z" fill="url(#steelLoader)" stroke="#6f7680" strokeWidth="1.2" />
+      <motion.g style={{ transformOrigin: '77px 78px' }} animate={{ rotate: [22, 22, -7, 22, -7, 22] }} transition={transition}>
+        <path d="M81 77 123 121c5 5 13 5 18 0s5-13 0-18L93 67Z" fill="url(#steel)" stroke="#45484F" strokeWidth="1.4"/>
+        <path d="M82 75 108 50" stroke="#8D929A" strokeWidth="7" strokeLinecap="round"/>
+        <circle cx="119" cy="39" r="16" stroke="url(#gold)" strokeWidth="5" fill="#0C0C0F"/>
+        <circle cx="119" cy="39" r="9.5" stroke="#6E5520" strokeWidth="1" opacity=".7"/>
       </motion.g>
 
-      <circle cx="60" cy="60" r="5" fill="url(#goldLoader)" />
-      <circle cx="60" cy="60" r="2" fill="#08080a" />
+      <circle cx="77" cy="78" r="6.5" fill="url(#gold)" stroke="#F5EAD0" strokeWidth="1"/>
+      <circle cx="77" cy="78" r="2.2" fill="#171719"/>
 
-      {step > 0 && (
-        <motion.line
-          key={step}
-          x1="38"
-          y1="102"
-          x2="82"
-          y2="102"
-          stroke="url(#goldLoader)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0.9 }}
-          animate={{ pathLength: 1, opacity: 0 }}
-          transition={{ duration: 0.35 }}
-        />
-      )}
+      {[0,1].map((i) => (
+        <motion.g key={i} initial={{ opacity: 0 }} animate={{ opacity: [0,0,1,0] }} transition={{ delay: i === 0 ? .46 : 1.02, duration: .32 }}>
+          <path d="M43 79H111" stroke="#F0D98D" strokeWidth="1.4" strokeLinecap="round"/>
+          <path d="M49 74 44 70M105 74l5-4M53 84l-4 5M101 84l4 5" stroke="#D4AF37" strokeWidth="1.2" strokeLinecap="round"/>
+        </motion.g>
+      ))}
     </motion.svg>
   );
 }

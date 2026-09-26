@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { business } from '@/data/business';
+import { services, formatPrice } from '@/data/services';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useOpenStatus } from '@/hooks/useOpenStatus';
 import { Loader } from '@/components/Loader';
@@ -12,7 +13,6 @@ import { Location } from '@/components/Location';
 import { About } from '@/components/About';
 import { WorkingHours } from '@/components/WorkingHours';
 import { Contact } from '@/components/Contact';
-import { BookingSheet } from '@/components/BookingSheet';
 import { Footer } from '@/components/Footer';
 import { FloatingBookButton } from '@/components/FloatingBookButton';
 
@@ -20,73 +20,77 @@ export default function App() {
   const { language, t, changeLanguage, hasStoredLang } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [showLangModal, setShowLangModal] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [bookingService, setBookingService] = useState<string | null>(null);
   const [showFloatingBook, setShowFloatingBook] = useState(false);
-
   const openStatus = useOpenStatus(business.workingHours.daily.open, business.workingHours.daily.close);
 
-  useEffect(() => {
-    if (!loading && !hasStoredLang) setShowLangModal(true);
-  }, [loading, hasStoredLang]);
+  useEffect(() => { if (!loading && !hasStoredLang) setShowLangModal(true); }, [loading, hasStoredLang]);
 
   useEffect(() => {
-    const onScroll = () => setShowFloatingBook(window.scrollY > 500);
+    const onScroll = () => setShowFloatingBook(window.scrollY > 520);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const openBooking = (serviceId?: string) => {
-    setBookingService(serviceId ?? 'haircut');
-    setBookingOpen(true);
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      const el = event.target as HTMLElement | null;
+      if (el?.closest('button,a') && 'vibrate' in navigator) navigator.vibrate?.(8);
+    };
+    document.addEventListener('click', onClick, { passive: true });
+    return () => document.removeEventListener('click', onClick);
+  }, []);
+
+  const bookingMessages = useMemo(() => {
+    return Object.fromEntries(services.map(service => [service.id, t.booking.messageTemplate.replace('{service}', service.name[language]).replace('{price}', formatPrice(service.price))]));
+  }, [language, t.booking.messageTemplate]);
+
+  const openServiceTelegram = async (serviceId: string) => {
+    const message = bookingMessages[serviceId] ?? '';
+    if (!message) return;
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(message);
+      else fallbackCopy(message);
+    } catch { fallbackCopy(message); }
+    const url = `${business.telegramUrl}?text=${encodeURIComponent(message)}`;
+    window.location.href = url;
   };
+
+  const openGenericTelegram = () => { window.location.href = business.telegramUrl; };
 
   return (
     <>
       <div className="grain-overlay" />
+      <div className="ambient-grid" aria-hidden="true" />
       {loading && <Loader tagline={t.loader.tagline} onComplete={() => setLoading(false)} />}
-      <LanguageModal
-        open={showLangModal}
-        onSelect={(lang) => {
-          changeLanguage(lang);
-          setShowLangModal(false);
-        }}
-        title={t.languageModal.title}
-        subtitle={t.languageModal.subtitle}
-      />
+      <LanguageModal open={showLangModal} onSelect={(lang) => { changeLanguage(lang); setShowLangModal(false); }} title={t.languageModal.title} subtitle={t.languageModal.subtitle} />
 
       <div className="relative min-h-screen overflow-hidden">
-        <Header
-          t={t}
-          language={language}
-          onLanguageChange={changeLanguage}
-          telegramUrl={business.telegramUrl}
-          phone={business.phone}
-          masterName={business.name}
-        />
-
+        <Header t={t} language={language} onLanguageChange={changeLanguage} telegramUrl={business.telegramUrl} phone={business.phone} masterName={business.name} />
         <main>
           <Hero t={t} language={language} business={business} isOpen={openStatus.isOpen} />
-          <Services t={t} language={language} onBook={(id) => openBooking(id)} />
+          <Services t={t} language={language} onBook={openServiceTelegram} />
           <ActionStrip t={t} business={business} />
           <Location t={t} language={language} business={business} />
           <About t={t} language={language} business={business} />
-          <WorkingHours t={t} language={language} business={business} isOpen={openStatus.isOpen} closesIn={null as never} opensIn={null as never} />
-          <Contact t={t} language={language} business={business} onBook={() => openBooking()} />
+          <WorkingHours t={t} language={language} business={business} isOpen={openStatus.isOpen} />
+          <Contact t={t} language={language} business={business} />
         </main>
-
         <Footer t={t} business={business} />
       </div>
-
-      <BookingSheet
-        open={bookingOpen}
-        onClose={() => setBookingOpen(false)}
-        serviceId={bookingService}
-        t={t}
-        language={language}
-      />
-      <FloatingBookButton t={t} visible={showFloatingBook && !bookingOpen} onBook={() => openBooking()} />
+      <FloatingBookButton t={t} visible={showFloatingBook} onBook={openGenericTelegram} />
     </>
   );
+}
+
+function fallbackCopy(text: string) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  document.execCommand('copy');
+  textarea.remove();
 }

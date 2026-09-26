@@ -20,7 +20,6 @@ export interface Translation {
   services: {
     title: string;
     subtitle: string;
-    duration: string;
     book: string;
     priceLabel: string;
   };
@@ -34,8 +33,9 @@ export interface Translation {
     title: string;
     subtitle: string;
     address: string;
-    openMap: string;
-    route: string;
+    yandexMaps: string;
+    yandexGo: string;
+    twoGis: string;
   };
   about: {
     title: string;
@@ -62,7 +62,6 @@ export interface Translation {
     title: string;
     service: string;
     price: string;
-    duration: string;
     telegram: string;
     call: string;
     copy: string;
@@ -98,12 +97,11 @@ export const translations: Record<Language, Translation> = {
       closed: 'Yopiq',
       bookNow: 'Yozilish',
       callNow: 'Qo‘ng‘iroq',
-      daily: 'Har kuni 13:00–01:00',
+      daily: 'Har kuni 08:00–22:00',
     },
     services: {
       title: 'Xizmatlar va narxlar',
       subtitle: 'Kerakli xizmatni tanlang va darhol bog‘laning.',
-      duration: 'Davomiyligi',
       book: 'Yozilish',
       priceLabel: 'Narx',
     },
@@ -117,8 +115,9 @@ export const translations: Record<Language, Translation> = {
       title: 'Joylashuv',
       subtitle: 'Nuqta va yo‘l ko‘rsatmasi',
       address: 'Manzil',
-      openMap: 'Xaritani ochish',
-      route: 'Yo‘l ko‘rsatish',
+      yandexMaps: 'Yandex Maps',
+      yandexGo: 'Yandex Go taksi',
+      twoGis: '2GIS',
     },
     about: {
       title: 'Nega aynan Nizom',
@@ -145,7 +144,6 @@ export const translations: Record<Language, Translation> = {
       title: 'Yozilish',
       service: 'Xizmat',
       price: 'Narx',
-      duration: 'Davomiyligi',
       telegram: 'Telegramda yozilish',
       call: 'Qo‘ng‘iroq qilish',
       copy: 'Matnni nusxalash',
@@ -179,12 +177,11 @@ export const translations: Record<Language, Translation> = {
       closed: 'Закрыто',
       bookNow: 'Записаться',
       callNow: 'Позвонить',
-      daily: 'Ежедневно 13:00–01:00',
+      daily: 'Ежедневно 08:00–22:00',
     },
     services: {
       title: 'Услуги и цены',
       subtitle: 'Выберите нужную услугу и сразу свяжитесь.',
-      duration: 'Длительность',
       book: 'Записаться',
       priceLabel: 'Цена',
     },
@@ -198,8 +195,9 @@ export const translations: Record<Language, Translation> = {
       title: 'Локация',
       subtitle: 'Точка и маршрут',
       address: 'Адрес',
-      openMap: 'Открыть карту',
-      route: 'Построить маршрут',
+      yandexMaps: 'Открыть в Яндекс Картах',
+      yandexGo: 'Заказать Яндекс Go',
+      twoGis: 'Открыть в 2GIS',
     },
     about: {
       title: 'Почему Nizom',
@@ -226,7 +224,6 @@ export const translations: Record<Language, Translation> = {
       title: 'Запись',
       service: 'Услуга',
       price: 'Цена',
-      duration: 'Длительность',
       telegram: 'Записаться в Telegram',
       call: 'Позвонить',
       copy: 'Скопировать текст',
@@ -260,12 +257,11 @@ export const translations: Record<Language, Translation> = {
       closed: 'Closed',
       bookNow: 'Book now',
       callNow: 'Call now',
-      daily: 'Daily 13:00–01:00',
+      daily: 'Daily 08:00–22:00',
     },
     services: {
       title: 'Services & prices',
       subtitle: 'Choose a service and contact instantly.',
-      duration: 'Duration',
       book: 'Book now',
       priceLabel: 'Price',
     },
@@ -279,8 +275,9 @@ export const translations: Record<Language, Translation> = {
       title: 'Location',
       subtitle: 'Point and directions',
       address: 'Address',
-      openMap: 'Open map',
-      route: 'Get directions',
+      yandexMaps: 'Open in Yandex Maps',
+      yandexGo: 'Order Yandex Go',
+      twoGis: 'Open in 2GIS',
     },
     about: {
       title: 'Why Nizom',
@@ -307,7 +304,6 @@ export const translations: Record<Language, Translation> = {
       title: 'Booking',
       service: 'Service',
       price: 'Price',
-      duration: 'Duration',
       telegram: 'Book in Telegram',
       call: 'Call now',
       copy: 'Copy text',
