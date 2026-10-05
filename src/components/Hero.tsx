@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Phone, Send, Sparkles } from 'lucide-react';
+import { Clock3, Phone, Send, Sparkles, Star } from 'lucide-react';
 import type { Translation, Language } from '@/data/translations';
 import type { BusinessInfo } from '@/data/business';
 import { formatPrice, services } from '@/data/services';
+import heroImage from '@/assets/nizom-hero.webp';
 
 interface HeroProps { t: Translation; language: Language; business: BusinessInfo; isOpen: boolean; }
 
@@ -16,10 +18,10 @@ export function Hero({ t, language, business, isOpen }: HeroProps) {
       <motion.div style={{ y: ySoft }} className="pointer-events-none absolute -left-24 top-24 h-80 w-80 rounded-full bg-gold-400/[0.1] blur-[120px]"/>
       <motion.div style={{ y: yReverse }} className="pointer-events-none absolute -right-24 top-44 h-80 w-80 rounded-full bg-gold-400/[0.1] blur-[140px]"/>
 
-      <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[.96fr_1.04fr] xl:gap-14">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.22,1,.36,1] }}>
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-gold-400/[0.2] bg-gold-400/[0.05] px-4 py-2 text-xs uppercase tracking-[0.28em] text-gold-300"><Sparkles size={14}/>{t.hero.eyebrow}</div>
-          <h1 className="font-display text-5xl leading-[.9] text-cream-100 md:text-7xl lg:text-8xl">{business.name}</h1>
+          <h1 className="font-display text-5xl leading-[.9] text-cream-100 md:text-7xl lg:text-[5.25rem]">{business.name}</h1>
           <p className="mt-4 max-w-2xl text-lg text-gold-300 md:text-2xl">{business.slogan[language]}</p>
           <p className="mt-6 max-w-xl text-base leading-8 text-cream-200/[0.66] md:text-lg">{business.description[language]}</p>
 
@@ -29,53 +31,78 @@ export function Hero({ t, language, business, isOpen }: HeroProps) {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href={business.telegramUrl} className="inline-flex min-h-[48px] items-center gap-2 rounded-full gold-gradient px-6 text-sm font-semibold text-ink-950 shadow-lg shadow-gold-500/[0.2] transition hover:translate-y-[-1px] hover:brightness-105"><Send size={16}/>{t.hero.bookNow}</a>
+            <a href={business.telegramUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[48px] items-center gap-2 rounded-full gold-gradient px-6 text-sm font-semibold text-ink-950 shadow-lg shadow-gold-500/[0.2] transition hover:translate-y-[-1px] hover:brightness-105"><Send size={16}/>{t.hero.bookNow}</a>
             <a href={`tel:${business.phone}`} className="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.05] px-6 text-sm font-semibold text-cream-100 transition hover:border-gold-400/[0.3]"><Phone size={16}/>{t.hero.callNow}</a>
+          </div>
+
+          <div className="mt-10 grid gap-3 sm:grid-cols-3">
+            <InfoPill icon={<Star size={15} />} label="Premium" value="Barber" />
+            <InfoPill icon={<Clock3 size={15} />} label="Open" value="08:00–22:00" />
+            <InfoPill icon={<Sparkles size={15} />} label="Telegram" value="@barbernizom" />
           </div>
         </motion.div>
 
-        <BarberVisual language={language} />
+        <BarberVisual language={language} business={business} />
       </div>
     </section>
   );
 }
 
-function BarberVisual({ language }: { language: Language }) {
+function BarberVisual({ language, business }: { language: Language; business: BusinessInfo }) {
   const preview = services.slice(0, 2);
   return (
     <motion.div className="relative" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .1, duration: .7, ease: [0.22,1,.36,1] }}>
       <div className="absolute -inset-5 rounded-[42px] bg-gradient-to-br from-gold-400/[0.16] via-transparent to-transparent blur-2xl"/>
-      <div className="relative min-h-[480px] overflow-hidden rounded-[34px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.015))] p-4 backdrop-blur-xl md:min-h-[570px]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_26%,rgba(212,175,55,.12),transparent_24%),linear-gradient(180deg,rgba(255,255,255,.02),transparent_35%)]"/>
-        <motion.div className="absolute right-10 top-14 h-64 w-64 rounded-full border border-white/[0.05]" animate={{ rotate: 360 }} transition={{ duration: 38, repeat: Infinity, ease: 'linear' }}/>
-        <motion.div className="absolute right-20 top-24 h-48 w-48 rounded-full border border-gold-400/[0.1]" animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}/>
+      <div className="relative overflow-hidden rounded-[34px] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.015))] p-4 backdrop-blur-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,rgba(212,175,55,.14),transparent_24%),linear-gradient(180deg,rgba(255,255,255,.02),transparent_35%)]"/>
 
-        <div className="relative flex min-h-[448px] flex-col justify-between md:min-h-[538px]">
-          <div className="flex items-center justify-between rounded-[24px] border border-white/[0.08] bg-black/[0.2] px-5 py-4 backdrop-blur-xl">
-            <span className="text-xs uppercase tracking-[.28em] text-cream-200/[0.4]">NIZOM · BARBER</span>
-            <span className="h-2 w-2 rounded-full bg-gold-400 shadow-[0_0_24px_rgba(212,175,55,.65)]"/>
-          </div>
+        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-black/[0.22]">
+          <img
+            src={heroImage}
+            alt={business.name}
+            className="h-[500px] w-full object-cover object-center md:h-[640px]"
+            loading="eager"
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,8,.02),rgba(6,6,8,.15)_38%,rgba(6,6,8,.72)_100%)]" />
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/[0.3] to-transparent" />
 
-          <div className="relative mx-auto my-4 h-64 w-full max-w-sm">
-            <motion.svg viewBox="0 0 360 270" className="h-full w-full" fill="none" aria-hidden="true" animate={{ y: [0,-7,0] }} transition={{ duration: 5.4, repeat: Infinity, ease: 'easeInOut' }}>
-              <defs><linearGradient id="heroSteel" x1="70" y1="30" x2="292" y2="235"><stop stopColor="#F9F9F6"/><stop offset=".4" stopColor="#8D939B"/><stop offset=".7" stopColor="#E8E8E3"/><stop offset="1" stopColor="#5E6268"/></linearGradient><linearGradient id="heroGold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#F8E8AF"/><stop offset=".5" stopColor="#D4AF37"/><stop offset="1" stopColor="#7D5918"/></linearGradient></defs>
-              <g opacity=".95">
-                <path d="M167 137 73 225c-13 12-33 11-44-2-10-13-8-32 5-42l115-72Z" fill="url(#heroSteel)" stroke="#4B4D53" strokeWidth="2"/>
-                <path d="M193 137 287 225c13 12 33 11 44-2 10-13 8-32-5-42l-115-72Z" fill="url(#heroSteel)" stroke="#4B4D53" strokeWidth="2"/>
-                <path d="m165 132-53-53" stroke="#8E949C" strokeWidth="13" strokeLinecap="round"/>
-                <path d="m195 132 53-53" stroke="#8E949C" strokeWidth="13" strokeLinecap="round"/>
-                <circle cx="92" cy="58" r="35" stroke="url(#heroGold)" strokeWidth="10" fill="#0B0B0D"/>
-                <circle cx="268" cy="58" r="35" stroke="url(#heroGold)" strokeWidth="10" fill="#0B0B0D"/>
-                <circle cx="180" cy="137" r="14" fill="url(#heroGold)"/><circle cx="180" cy="137" r="5" fill="#0B0B0D"/>
-              </g>
-            </motion.svg>
-          </div>
+          <motion.div
+            className="absolute left-4 top-4 rounded-full border border-white/[0.12] bg-black/[0.34] px-4 py-2 backdrop-blur-xl"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <p className="text-[11px] uppercase tracking-[0.28em] text-gold-300">{business.role[language]}</p>
+          </motion.div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {preview.map(item => <div key={item.id} className="rounded-[22px] border border-white/[0.09] bg-ink-950/[0.6] p-4 backdrop-blur-xl"><p className="text-[10px] uppercase tracking-[.16em] text-cream-200/[0.4]">{item.name[language]}</p><p className="mt-2 font-display text-3xl leading-none gold-text">{formatPrice(item.price)}</p></div>)}
+          <motion.div
+            className="absolute right-4 top-4 rounded-[22px] border border-white/[0.1] bg-black/[0.32] px-4 py-3 backdrop-blur-xl"
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <p className="text-[10px] uppercase tracking-[0.22em] text-cream-200/[0.4]">NIZOM</p>
+            <p className="mt-1 font-display text-2xl leading-none text-cream-100">Barber</p>
+          </motion.div>
+
+          <div className="absolute bottom-4 left-4 right-4 grid gap-3 md:grid-cols-2">
+            {preview.map(item => (
+              <div key={item.id} className="rounded-[22px] border border-white/[0.09] bg-ink-950/[0.62] p-4 backdrop-blur-xl shadow-lg shadow-black/20">
+                <p className="text-[10px] uppercase tracking-[.16em] text-cream-200/[0.4]">{item.name[language]}</p>
+                <p className="mt-2 font-display text-3xl leading-none gold-text">{formatPrice(item.price)}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function InfoPill({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-[22px] border border-white/[0.08] bg-white/[0.03] p-4 backdrop-blur-xl">
+      <div className="flex items-center gap-2 text-gold-300">{icon}<span className="text-[10px] uppercase tracking-[0.22em] text-cream-200/[0.45]">{label}</span></div>
+      <p className="mt-2 text-base font-medium text-cream-100">{value}</p>
+    </div>
   );
 }
